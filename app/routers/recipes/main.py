@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 # internal
@@ -17,11 +17,13 @@ def list(
 
 
 @router.get("/{recipe_id}")
-def get(recipe_id: int, response: Response, db: Session = Depends(get_db)):
+def get(recipe_id: int, db: Session = Depends(get_db)):
     recipe = db.query(schemas.Recipe).filter(schemas.Recipe.id == recipe_id).first()
     if not recipe:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"Detail": f"Recipe with id {recipe_id} does not exist"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Recipe with id {recipe_id} does not exist",
+        )
     return recipe
 
 
@@ -31,6 +33,34 @@ def create(request: models.Recipe, db: Session = Depends(get_db)):
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
+    return {}
+
+
+@router.patch("/{recipe_id}", status_code=status.HTTP_202_ACCEPTED)
+def patch(recipe_id, request: models.Recipe, db: Session = Depends(get_db)):
+    recipe = db.query(schemas.Recipe).filter(schemas.Recipe.id == recipe_id)
+    if not recipe.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Recipe with id {recipe_id} does not exist",
+        )
+
+    # TODO replace with request without destructuring
+    recipe.update({"title": request.title, "directions": request.directions})
+    db.commit()
+    return {}
+
+
+@router.delete("/{recipe_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete(recipe_id: int, db: Session = Depends(get_db)):
+    recipe = db.query(schemas.Recipe).filter(schemas.Recipe.id == recipe_id)
+    if not recipe.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Recipe with id {recipe_id} does not exist",
+        )
+    recipe.delete(synchronize_session=False)
+    db.commit()
     return {}
 
 
