@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class Recipe(BaseModel):
     title: str
     directions: str
-    cooking_time: timedelta
+    cooking_time: timedelta | None
     is_active: bool | None
 
 

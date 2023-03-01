@@ -1,5 +1,9 @@
-from fastapi import APIRouter
-from app.models.recipes import Recipe
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+# internal
+from app import schemas, models
+from app.routers.utils import get_db
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -17,8 +21,12 @@ def get(recipe_id: int):
 
 
 @router.post("/")
-def create(recipe: Recipe):
-    return {"data": "New recipe created!"}
+def create(request: models.Recipe, db: Session = Depends(get_db)):
+    new_blog = schemas.Recipe(title=request.title, directions=request.directions)
+    db.add(new_blog)
+    db.commit()
+    db.refresh(new_blog)
+    return new_blog
 
 
 @router.get("/{recipe_id}/comments")
