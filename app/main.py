@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 
 from app.routers import internal, recipes
-from app import schemas
+from app import models
 from app.database import engine
 
 app = FastAPI()
 
-schemas.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 
 app.include_router(internal.router)

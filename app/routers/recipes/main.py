@@ -2,23 +2,21 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 # internal
-from app import schemas, models
+from app import models, schemas
 from app.routers.utils import get_db
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
 
 @router.get("/")
-def list(
-    db: Session = Depends(get_db),
-):
-    recipes = db.query(schemas.Recipe).all()
+def list(db: Session = Depends(get_db)):
+    recipes = db.query(models.Recipe).all()
     return recipes
 
 
 @router.get("/{recipe_id}")
 def get(recipe_id: int, db: Session = Depends(get_db)):
-    recipe = db.query(schemas.Recipe).filter(schemas.Recipe.id == recipe_id).first()
+    recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if not recipe:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -28,8 +26,8 @@ def get(recipe_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create(request: models.Recipe, db: Session = Depends(get_db)):
-    new_blog = schemas.Recipe(title=request.title, directions=request.directions)
+def create(request: schemas.Recipe, db: Session = Depends(get_db)):
+    new_blog = models.Recipe(title=request.title, directions=request.directions)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
@@ -37,8 +35,8 @@ def create(request: models.Recipe, db: Session = Depends(get_db)):
 
 
 @router.patch("/{recipe_id}", status_code=status.HTTP_202_ACCEPTED)
-def patch(recipe_id, request: models.Recipe, db: Session = Depends(get_db)):
-    recipe = db.query(schemas.Recipe).filter(schemas.Recipe.id == recipe_id)
+def patch(recipe_id, request: schemas.Recipe, db: Session = Depends(get_db)):
+    recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id)
     if not recipe.first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -53,7 +51,7 @@ def patch(recipe_id, request: models.Recipe, db: Session = Depends(get_db)):
 
 @router.delete("/{recipe_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(recipe_id: int, db: Session = Depends(get_db)):
-    recipe = db.query(schemas.Recipe).filter(schemas.Recipe.id == recipe_id)
+    recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id)
     if not recipe.first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
