@@ -13,3 +13,11 @@ class PublicUser(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class LoginOrRegister(BaseModel):
+    username: str
+    password: str
+
+    # class Config:
+    #     orm_mode = True

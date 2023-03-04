@@ -4,7 +4,7 @@ from typing import List
 
 # internal
 from app import models, schemas
-from app.utils import get_db
+from app.database import get_db
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -38,7 +38,7 @@ def create(request: schemas.RecipeWithoutOwner, db: Session = Depends(get_db)):
 
 
 @router.patch("/{recipe_id}", status_code=status.HTTP_202_ACCEPTED)
-def patch(
+def update(
     recipe_id, request: schemas.RecipeWithoutOwner, db: Session = Depends(get_db)
 ):
     recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id)

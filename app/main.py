@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.routers import internal, recipes, users
+from app.routers import internal, recipes, users, auth
 from app import models
 from app.database import engine
 
@@ -10,5 +10,6 @@ models.Base.metadata.create_all(bind=engine)
 
 
 app.include_router(internal.router)
+app.include_router(auth.router)
 app.include_router(recipes.router)
 app.include_router(users.router)
