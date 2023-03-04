@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import List
 
 # internal
 from app import models, schemas
@@ -8,13 +9,13 @@ from app.routers.utils import get_db
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
 
-@router.get("/")
-def list(db: Session = Depends(get_db)):
+@router.get("/", response_model=List[schemas.Recipe])
+def get_all(db: Session = Depends(get_db)):
     recipes = db.query(models.Recipe).all()
     return recipes
 
 
-@router.get("/{recipe_id}")
+@router.get("/{recipe_id}", response_model=schemas.Recipe)
 def get(recipe_id: int, db: Session = Depends(get_db)):
     recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if not recipe:
