@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 # internal
-from app.routers.utils import get_db
+from app.utils import get_db
 from app import models, schemas
 from app.utils import Hash
 

@@ -4,7 +4,7 @@ from typing import List
 
 # internal
 from app import models, schemas
-from app.routers.utils import get_db
+from app.utils import get_db
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
