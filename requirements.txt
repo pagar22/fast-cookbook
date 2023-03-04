@@ -4,3 +4,4 @@ black
 sqlalchemy
 passlib
 bcrypt
+python-jose
