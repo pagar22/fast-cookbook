@@ -5,6 +5,7 @@ from typing import List
 # internal
 from app import models, schemas
 from app.database import get_db
+from app.utils.token import get_current_user
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -27,9 +28,13 @@ def get(recipe_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create(request: schemas.RecipeWithoutOwner, db: Session = Depends(get_db)):
+def create(
+    request: schemas.RecipeWithoutOwner,
+    db: Session = Depends(get_db),
+    current_user: schemas.User = Depends(get_current_user),
+):
     new_blog = models.Recipe(
-        title=request.title, directions=request.directions, owner_id=1
+        title=request.title, directions=request.directions, owner_id=current_user.id
     )
     db.add(new_blog)
     db.commit()
