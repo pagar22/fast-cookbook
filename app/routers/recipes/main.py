@@ -28,7 +28,9 @@ def get(recipe_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create(request: schemas.Recipe, db: Session = Depends(get_db)):
-    new_blog = models.Recipe(title=request.title, directions=request.directions)
+    new_blog = models.Recipe(
+        title=request.title, directions=request.directions, owner_id=1
+    )
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)

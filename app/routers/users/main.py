@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import List
 
 # internal
 from app.routers.utils import get_db
@@ -31,3 +32,14 @@ def create(request: schemas.User, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+@router.get("/{user_id}/recipes", response_model=List[schemas.RecipeWithoutOwner])
+def get(user_id: int, db: Session = Depends(get_db)):
+    blogs = db.query(models.Recipe).filter(models.Recipe.owner_id == user_id).all()
+    if not blogs:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User {user_id} does not have any recipes",
+        )
+    return blogs
