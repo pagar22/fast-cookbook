@@ -27,7 +27,7 @@ def get(recipe_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create(request: schemas.Recipe, db: Session = Depends(get_db)):
+def create(request: schemas.RecipeWithoutOwner, db: Session = Depends(get_db)):
     new_blog = models.Recipe(
         title=request.title, directions=request.directions, owner_id=1
     )
@@ -38,7 +38,9 @@ def create(request: schemas.Recipe, db: Session = Depends(get_db)):
 
 
 @router.patch("/{recipe_id}", status_code=status.HTTP_202_ACCEPTED)
-def patch(recipe_id, request: schemas.Recipe, db: Session = Depends(get_db)):
+def patch(
+    recipe_id, request: schemas.RecipeWithoutOwner, db: Session = Depends(get_db)
+):
     recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id)
     if not recipe.first():
         raise HTTPException(
